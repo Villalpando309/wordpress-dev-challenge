@@ -1,0 +1,51 @@
+// Función que construye el shortcode
+function shortcake_example_callback( $attr, $content, $shortcode_tag ) {
+    $attr = shortcode_atts( array(
+        'source' => '',
+    ), $attr, $shortcode_tag );
+
+    ob_start();?>
+    <blockquote>
+        <p><?php echo wpautop( wp_kses_post( $content ) );?></br>
+        <strong><?php echo wp_kses_post( $attr[ 'source' ] ); ?></strong></p>
+    </section>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode( 'shortcake_example', 'shortcake_example_callback' );
+
+// Registramos la UI para el Shortcode.
+function shortcake_ui_example() {
+    $fields = array(
+        array(
+            'label' => esc_html__( 'Fuente', 'shortcode-ui-example' ),
+            'attr' => 'source',
+            'type' => 'text',
+            'encode' => true,
+            'meta' => array(
+                'placeholder' => esc_html__( 'Fuente', 'shortcode-ui-example' ),
+                'data-test' => 1,
+            ),
+        ),
+    );
+
+    $shortcode_ui_args = array(
+        // Etiqueta nombre del shortcode en UI. Requerido.
+        'label' => esc_html__( 'blockquote', 'shortcode-ui-example' ),
+        // Icono del shortcode. Opcional.
+        'listItemImage' => 'dashicons-editor-quote',
+        // Limitar el uso del shortcode a tipos de posts específicos. Opcional.
+        'post_type' => array( 'post' ),
+        // UI para el contenido interno del shortcode. Opcional
+        'inner_content' => array(
+            'label' => esc_html__( 'Texto', 'shortcode-ui-example' ),
+            'description' => esc_html__( 'Escribe la cita aquí', 'shortcode-ui-example' ),
+        ),
+        // Establecemos los campos adicionales declarados anteriormente. Opcional.
+        'attrs' => $fields,
+    );
+    shortcode_ui_register_for_shortcode( 'shortcake_example', $shortcode_ui_args );
+}
+add_action( 'register_shortcode_ui', 'shortcake_ui_example' );
+
+add_filter('use_block_editor_for_post', '__return_false', 10);
